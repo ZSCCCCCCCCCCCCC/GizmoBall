@@ -6,7 +6,6 @@ package entity;
  * 描述信息: A listener that can be triggered by `TriggerGenerator`s.
  *      - `TriggerGenerator`s will call trigger(TriggerGenerator) on TriggerListeners
  *          that have registered themselves with the TriggerGenerator
- *          (via TriggerGenerator.registerTriggerListener(TriggerListener))
  *          when the event that causes the TriggerGenerator to generate triggers happens.$
  *
  * 实例: For example, a flipper(挡板) might implement `TriggerListener` with a `trigger` method that flips the flipper,
