@@ -10,7 +10,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="GizmoBall" target="8" />
+      <module name="GizmoBall" target="1.5" />
     </bytecodeTargetLevel>
   </component>
 </project>
