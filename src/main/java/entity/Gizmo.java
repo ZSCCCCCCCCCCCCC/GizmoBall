@@ -1,6 +1,5 @@
 package entity;
 
-import com.sun.javafx.geom.Vec3d;
 import javafx.scene.shape.Sphere;
 
 import java.util.Vector;
@@ -14,74 +13,85 @@ import java.util.Vector;
  *
  * @author <a href="mail to: 10185101124@stu.ecnu.edu.cn" rel="nofollow">周政伟</a>
  * @update [1][2020-11-27 18:07] [周政伟][创建]
+ * @update [2][2020-11-28 12:07] [周政伟][修改物理属性(大小、方向)，删除属性(速度)]
  */
-public interface Gizmo extends TriggerListener, TriggerGenerator{
-    double reflectionCoefficient = 0.0;
-    Integer orient = null;
-    String name = null;
+public abstract class Gizmo implements TriggerListener, TriggerGenerator{
+    private static final int DEFAULT_SIZE = 1;
+    private static final Orient DEFAULT_ORIENT = Orient.RIGHT_UP_WARD; // 默认在 基点的右上方放置。
 
-    Vector<Float> position = null;
-    Vector<Float> velocity = null;
-    Sphere boundingSphere = null;
-    Board board = null;
+    private double reflectionCoefficient = 0.0; // 摩擦系数
+    private int size = DEFAULT_SIZE; // 组件的
+    private Orient orient = DEFAULT_ORIENT; // 方向
+    private String name = null; // 名称
 
-    /**
-     * A time step has occurred. Do whatever is necessary
-     * @param timeSinceLastStep:
-     */
-    void step(int timeSinceLastStep);
-
-    /**
-     * Move the Gizmo by offset to a new position.
-     * @param offset: a Vec3d.
-     * @modifies: this.position, boundingSphere
-     */
-    void move(Vec3d offset);
+    private Vector<Float> position = null; // 组件的 基点位置
+    private Board parentBoard = null;
 
     /**
      * Move the Gizmo to the absolute position specified.
-     * @param position: a Vec3d.
+     * @param position: a Vector<Float>  with capacity of 2.
      * @modifies: this.position, boundingSphere
+     * TODO
      */
-    void moveTo(Vec3d position);
+    public void moveTo(Vector<Float> position){
+
+    }
 
     /**
      * Set the parent board of this `Gizmo`.
      * This is important so we can know what how to find our peer `Gizmo`s to check for collisions, etc.
      * @param board: father board
      */
-    Gizmo setBoard(Board board);
-
-    /**
-     * Set the orientation of the Gizmo, if applicable.
-     */
-    void setOrientation(Integer orient);
+    public Gizmo setBoard(Board board){
+        this.parentBoard = board;
+        return this;
+    }
 
     /**
      * @param otherGizmo: an instantiated Gizmo
      * @return: Whether we are close enough to otherGizmo to start doing real math.
+     * TODO
      */
-    boolean proximate(Gizmo otherGizmo);
+    public boolean proximate(Gizmo otherGizmo){
+        return true;
+    }
+
+    public Vector<Float> getPosition(){
+        return this.position;
+    }
+
+    public Orient getOrient(){
+        return this.orient;
+    }
 
     /**
-     *
-     * @param otherGizmo: an instantiated Gizmo (or Ball)
-     * @param timeStep:
-     * @return: are we actually colliding with the other Gizmo (or Ball)
+     * Set the orientation of the Gizmo, if applicable.
+     * TODO: detect
      */
-    boolean colliding(Gizmo otherGizmo, double timeStep);
+    public Gizmo setOrient(Orient orient){
+        this.orient = orient;
+        return this;
+    }
 
-    Sphere getBoundingSphere();
+    public int getSize(){
+        return this.size;
+    }
 
-    Vector<Float> getPosition();
+    public double getReflectionCoefficient(){
+        return this.reflectionCoefficient;
+    }
 
-    Vector<Float> getVelocity();
+    public Gizmo setReflectionCoefficient(double coefficient){
+        this.reflectionCoefficient = coefficient;
+        return this;
+    }
 
-    Integer getOrient();
+    public String getName(){
+        return this.getName();
+    }
 
-    double getReflectionCoefficient();
-
-    String getName();
-
-    Gizmo setName(String name);
+    public Gizmo setName(String name){
+        this.name = name;
+        return this;
+    }
 }

@@ -1,5 +1,7 @@
 package entity;
 
+import util.EventType;
+
 /**
  * 项目名称: GizmoBall
  * 创建时间: 2020/11/27
