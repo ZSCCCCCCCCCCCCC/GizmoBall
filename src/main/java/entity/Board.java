@@ -1,6 +1,7 @@
 package entity;
 
 import exception.NonUniqueGizmoNameException;
+import exception.OverlapException;
 import exception.XMLLoadException;
 import util.BoardBuilderXML;
 import util.Display;
@@ -127,23 +128,27 @@ public class Board implements Iterable<Gizmo>{
     /**
      * @param gizmo: gizmo to be added.
      * @require: the gizmo's x, y coordinates are inside of
-     *  the current or eventual(最终的) max x, y coordinates of the Board
-     * @effects: adds a new gizmo to the boardGizmos list
+        the current or eventual(最终的) max x, y coordinates of the Board
+     * @effects: adds a new gizmo to the boardGizmos list if no overlapping exists, otherwise,
+        does nothing but throws a OverlapException.
      * @modifies: boardGizmos
      * @throws NonUniqueGizmoNameException: if someone tries to add a gizmo that does not have a unique name.
      */
-    public void addGizmo(Gizmo gizmo) throws NonUniqueGizmoNameException {
+    public boolean addGizmo(Gizmo gizmo) throws NonUniqueGizmoNameException, OverlapException {
         assert (gizmo.getPosition().get(0) < maxDims.get(0));
         assert (gizmo.getPosition().get(1) < maxDims.get(1));
 
-        if(isNameUnique(gizmo.getName()))
-            boardGizmos.add(gizmo);
-        else{
+        if(!isNameUnique(gizmo.getName())){
             throw new NonUniqueGizmoNameException();
+        } else if(checkOverlapping(gizmo)){
+            throw new OverlapException();
+        } else {
+            boardGizmos.add(gizmo);
+            return true;
         }
     }
 
-    public void addGizmos(Collection<Gizmo> gizmos) throws NonUniqueGizmoNameException{
+    public void addGizmos(Collection<Gizmo> gizmos) throws NonUniqueGizmoNameException, OverlapException{
         for (Gizmo gizmo : gizmos) {
             addGizmo(gizmo);
         }
@@ -215,7 +220,7 @@ public class Board implements Iterable<Gizmo>{
      * @return: Whether or not the board was ready and steps were called on board elements.
      * @throws InterruptedException:  if the current thread is interrupted
      * @effects: calls step on all board elements, effectively stepping the board.
-     * @TODO: step method.
+     * TODO: step method.
      */
     public boolean step(int timeSinceLastStep) throws InterruptedException{
         return true;
@@ -230,8 +235,21 @@ public class Board implements Iterable<Gizmo>{
     }
 
     /**
+     * Check to see if checkedGizmo is overlapped by the `Gizmo`s in boardGizmos.
+     * @param checkedGizmo: the `Gizmo` being added to boardGizmos.
+     */
+    public boolean checkOverlapping(Gizmo checkedGizmo){
+        for (Gizmo gizmo : boardGizmos) {
+            if(checkedGizmo.isOverlapped(gizmo)){
+                return true;
+            };
+        }
+        return false;
+    }
+
+    /**
      * @return: true if isBoardReady() is true and all gizmos are inside of the maximum dimensions of the board.
-     * @TODO: all gizmos are inside of the maximum dimensions of the board.
+     * TODO: all gizmos are inside of the maximum dimensions of the board .
      */
     public boolean checkGizmos(){
         return isBoardReady();

@@ -10,7 +10,7 @@ import java.util.Vector;
  * @author <a href="mail to: 10185101124@stu.ecnu.edu.cn" rel="nofollow">周政伟</a>
  * @update [1][2020-11-28 12:55] [周政伟][创建]
  */
-public class Ball extends Gizmo{
+public class Ball extends Gizmo implements UnResizable{
     /**
      * A time step has occurred. Do whatever is necessary
      * @param timeSinceLastStep:

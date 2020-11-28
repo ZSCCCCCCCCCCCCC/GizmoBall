@@ -1,6 +1,6 @@
 package entity;
 
-import javafx.scene.shape.Sphere;
+import exception.OverlapException;
 
 import java.util.Vector;
 
@@ -14,27 +14,81 @@ import java.util.Vector;
  * @author <a href="mail to: 10185101124@stu.ecnu.edu.cn" rel="nofollow">周政伟</a>
  * @update [1][2020-11-27 18:07] [周政伟][创建]
  * @update [2][2020-11-28 12:07] [周政伟][修改物理属性(大小、方向)，删除属性(速度)]
+ * @update [3][2020-11-28 14:53] [周政伟][将方向属性分离为子类，大小分离为子类]
  */
 public abstract class Gizmo implements TriggerListener, TriggerGenerator{
     private static final int DEFAULT_SIZE = 1;
-    private static final Orient DEFAULT_ORIENT = Orient.RIGHT_UP_WARD; // 默认在 基点的右上方放置。
 
     private double reflectionCoefficient = 0.0; // 摩擦系数
-    private int size = DEFAULT_SIZE; // 组件的
-    private Orient orient = DEFAULT_ORIENT; // 方向
+    protected float size = DEFAULT_SIZE; // 组件的大小
+
     private String name = null; // 名称
 
     private Vector<Float> position = null; // 组件的 基点位置
-    private Board parentBoard = null;
+    protected Board parentBoard = null;
 
     /**
-     * Move the Gizmo to the absolute position specified.
+     * Move the Gizmo to the absolute position specified if no overlapping happens,
+        otherwise, recover to the previous position.
      * @param position: a Vector<Float>  with capacity of 2.
-     * @modifies: this.position, boundingSphere
-     * TODO
+     * @modifies: this.position
      */
-    public void moveTo(Vector<Float> position){
+    public void moveTo(Vector<Float> position) throws OverlapException {
+        assert (position.capacity() == 2);
+        assert (position.get(0) > 0 && position.get(1) > 0);
 
+        parentBoard.removeGizmo(this);
+
+        Vector<Float> prePos = position;
+        this.position = position;
+
+        try{
+            parentBoard.addGizmo(this);
+        } catch (OverlapException e){
+            this.position = prePos;
+            try {
+                parentBoard.addGizmo(this);
+            }catch (Exception exception){
+                exception.printStackTrace();
+            }
+            throw e;
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 改变 组件的 大小，对于三角形可能需要覆写。
+     * @param size: 组件的新大小。
+     * @require: 只有可放大的组件才可以调用此方法。
+     */
+    public void setSize(float size) throws OverlapException{
+        assert (! (this instanceof UnResizable)); // 不可以放大的组件。
+
+        // 缩小视图不需要覆盖检测。
+        if (this.size >= size) {
+            this.size = size;
+        }
+        parentBoard.removeGizmo(this);
+        float preSize = this.size;
+        this.size = size;
+        try {
+            parentBoard.addGizmo(this);
+        } catch (OverlapException e) {
+            this.size = preSize;
+            try {
+                parentBoard.addGizmo(this);
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public float getSize(){
+        return this.size;
     }
 
     /**
@@ -49,32 +103,22 @@ public abstract class Gizmo implements TriggerListener, TriggerGenerator{
 
     /**
      * @param otherGizmo: an instantiated Gizmo
-     * @return: Whether we are close enough to otherGizmo to start doing real math.
-     * TODO
+     * @return: Whether it is overlapped to otherGizmo.
+     * Note: object which extends `OrientableGizmo` should override this method.
      */
-    public boolean proximate(Gizmo otherGizmo){
-        return true;
+    public boolean isOverlapped(Gizmo otherGizmo){
+        // otherGizmo 是一个 可定向组件。
+        if(otherGizmo instanceof OrientatableGizmo)
+            return otherGizmo.isOverlapped(this);
+        // 俩者都是 不可定向（对称）组件。
+        float sizeSum = this.size + otherGizmo.size;
+        // x 反向重叠 && y方向重叠
+        return Math.abs(this.position.get(0) - otherGizmo.position.get(0)) < sizeSum
+                    && (Math.abs(this.position.get(1) - otherGizmo.position.get(1)) < sizeSum);
     }
 
     public Vector<Float> getPosition(){
         return this.position;
-    }
-
-    public Orient getOrient(){
-        return this.orient;
-    }
-
-    /**
-     * Set the orientation of the Gizmo, if applicable.
-     * TODO: detect
-     */
-    public Gizmo setOrient(Orient orient){
-        this.orient = orient;
-        return this;
-    }
-
-    public int getSize(){
-        return this.size;
     }
 
     public double getReflectionCoefficient(){
