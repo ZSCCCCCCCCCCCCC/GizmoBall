@@ -13,7 +13,7 @@ import exception.OverlapException;
 public abstract class OrientatableGizmo extends Gizmo{
     private static final Orient DEFAULT_ORIENT = Orient.RIGHT_UP_WARD; // 默认在 基点的右上方放置。
 
-    private Orient orient = DEFAULT_ORIENT; // 方向
+    protected Orient orient = DEFAULT_ORIENT; // 方向
 
     public Orient getOrient(){
         return this.orient;

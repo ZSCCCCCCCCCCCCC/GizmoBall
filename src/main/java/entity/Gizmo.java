@@ -17,15 +17,23 @@ import java.util.Vector;
  * @update [3][2020-11-28 14:53] [周政伟][将方向属性分离为子类，大小分离为子类]
  */
 public abstract class Gizmo implements TriggerListener, TriggerGenerator{
-    private static final int DEFAULT_SIZE = 1;
+    protected static final float DEFAULT_SIZE = 1;
 
     private double reflectionCoefficient = 0.0; // 摩擦系数
     protected float size = DEFAULT_SIZE; // 组件的大小
 
     private String name = null; // 名称
 
-    private Vector<Float> position = null; // 组件的 基点位置
+    protected Vector<Float> position = null; // 组件的 基点位置
     protected Board parentBoard = null;
+
+    /**
+     * 对没有添加到 Board 中的组件设置位置（只用于初始化）。
+     */
+    public Gizmo setPosition(Vector<Float> position){
+        this.position = new Vector<>(position);
+        return this;
+    }
 
     /**
      * Move the Gizmo to the absolute position specified if no overlapping happens,
@@ -58,11 +66,19 @@ public abstract class Gizmo implements TriggerListener, TriggerGenerator{
     }
 
     /**
+     * 对没有添加到 Board 中的组件设置大小（只用于初始化）。
+     */
+    public Gizmo setSize(float size){
+        this.size = size;
+        return this;
+    }
+
+    /**
      * 改变 组件的 大小，对于三角形可能需要覆写。
      * @param size: 组件的新大小。
      * @require: 只有可放大的组件才可以调用此方法。
      */
-    public void setSize(float size) throws OverlapException{
+    public void changeSize(float size) throws OverlapException{
         assert (! (this instanceof UnResizable)); // 不可以放大的组件。
 
         // 缩小视图不需要覆盖检测。
