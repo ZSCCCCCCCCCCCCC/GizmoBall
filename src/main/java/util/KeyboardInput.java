@@ -1,4 +1,5 @@
 package util;
+package entity;
 
 /**
  * 项目名称: GizmoBall
@@ -9,4 +10,11 @@ package util;
  * @update [1][2020-11-27 19:29] [周政伟][创建]
  */
 public class KeyboardInput {
+	KeyboardTriggerGenerator getKeyboardTriggerGenerator(
+			int asciiCode, EventType eventType) {
+		
+	};
+	Set<KeyboardTriggerGenerator> getAllKeyboardTriggerGenerators(){
+		
+	};
 }

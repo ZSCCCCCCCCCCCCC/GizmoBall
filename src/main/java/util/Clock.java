@@ -9,4 +9,10 @@ package util;
  * @update [1][2020-11-27 23:48] [周政伟][创建]
  */
 public interface Clock {
+	void start();
+	void stop();
+	boolean isRunning();
+	void addBoardView(BoardView view);
+	void removeBoardView(BoardView view);
+
 }

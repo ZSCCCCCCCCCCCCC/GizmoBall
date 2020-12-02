@@ -9,4 +9,21 @@ package util;
  * @update [1][2020-11-27 19:29] [周政伟][创建]
  */
 public class Display {
+	private Board board;
+	private File boardFile;
+	private int clockTickSpeed;
+	private Clock clock;
+	private final GLBoardView boardView;
+	private SwingKeyboardInput keyboardInput;
+	private final GLCanvas boardCanvas;
+	private final MenuListener pausingMenuListener =
+			new MenuListener() {
+		public void menuCanceled(MenuEvent e) { }
+		public void menuDeselected(MenuEvent e) { }
+		public void menuSelected(MenuEvent e) { stopTime(); }
+	};
+	private Gizmo currentGizmo = null;
+	
+	public Display() {
+	}
 }
